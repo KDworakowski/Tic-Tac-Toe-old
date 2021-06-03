@@ -15,13 +15,13 @@ def print_tic_tac_toe(values):
     print("\n")
 
 def print_scoreboard(score_board):
-    print("--------------------------------")
-    print("            SCOREBOARD       ")
-    print("--------------------------------")
+    print("\t--------------------------------")
+    print("\t              SCOREBOARD       ")
+    print("\t--------------------------------")
 
     players = list(score_board.keys())
-    print("   ", players[0], "    ", score_board[players[0]])
-    print("   ", players[1], "    ", score_board[players[1]])
+    print("\t   ", players[0], "\t    ", score_board[players[0]])
+    print("\t   ", players[1], "\t    ", score_board[players[1]])
 
     print("--------------------------------\n")
 
@@ -32,10 +32,10 @@ def check_win(player_position, current_player):
     for x in all_possible_winning_combinations:
         if all(y in player_position[current_player] for y in x):
             return True
-        return False
+    return False
 
 def check_draw(player_position):
-    if len(player_position['X'] + len(player_position['O'])) == 9:
+    if len(player_position['X']) + len(player_position['O']) == 9:
         return True
     return False
 
@@ -143,7 +143,7 @@ if __name__ == "__main__":
             player_won = player_choice[winner]
             score_board[player_won] = score_board[player_won] + 1
 
-        print_scoreboard(score_boards)
+        print_scoreboard(score_board)
 
         if current_player == player1:
             current_player = player2
