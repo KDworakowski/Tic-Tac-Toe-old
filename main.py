@@ -35,9 +35,7 @@ def check_win(player_position, current_player):
     return False
 
 def check_draw(player_position):
-    if len(player_position['X']) + len(player_position['O']) == 9:
-        return True
-    return False
+    return len(player_position['X']) + len(player_position['O']) == 9
 
 def single_game(current_player):
 
