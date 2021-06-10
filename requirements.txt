@@ -1,2 +1,9 @@
+os
+asyncio
+typing
+signal
+hypercorn
+module
+
 fastapi
 werkzeug
