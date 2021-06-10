@@ -1,3 +1,6 @@
+"""
+This function is responsible for printing tic tac toe.
+"""
 def print_tic_tac_toe(values):
     print("\n")
     print("\t     |     |")
@@ -14,6 +17,9 @@ def print_tic_tac_toe(values):
     print("\t     |     |")
     print("\n")
 
+"""
+This function is responsible for printing scoreboard, scoreboard is printed after every game.
+"""
 def print_scoreboard(score_board):
     print("\t--------------------------------")
     print("\t              SCOREBOARD       ")
@@ -25,18 +31,38 @@ def print_scoreboard(score_board):
 
     print("--------------------------------\n")
 
+"""
+This function is responsible for checking which player won.
+It contains winning combinations, while "X" or "O" will be on
+these places then one of the players that have his "X" or "O" on these places will win.
+Basically if the current player will place his "X" or "O" and after this move player meet the requirements the player win.
+"""
 def check_win(player_position, current_player):
 
     all_possible_winning_combinations = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8]]
 
     for x in all_possible_winning_combinations:
+        # return all(y in player_position[current_player] for y in x):
         if all(y in player_position[current_player] for y in x):
             return True
     return False
 
+"""
+This function is responsible for checking is there a draw.
+When all of the player placed "X" or "O" 9 times in total, and there's no win, there's draw.
+"""
 def check_draw(player_position):
     return len(player_position['X']) + len(player_position['O']) == 9
 
+"""
+This function is responsible for every single game.
+It asks the player for input where he want to place his "X" or "O", if the player will
+put the wrong number, there's an error which asks the player to try again with chosing
+where the player want to put his "X" or "O". Also, if the player will want to place his "X" or "O" in
+the place that is already ocupied, there will be a similar error. If one of the players won the game or
+there is a draw, then it's saying which player won or there is a draw. After ecery move it's changing
+which player is moving next.
+"""
 def single_game(current_player):
 
     values = [' ' for x in range(9)]
@@ -147,3 +173,7 @@ if __name__ == "__main__":
             current_player = player2
         else:
             current_player = player1
+
+# After every game it change the "X" or "O" selection
+# so if player 1 was chosing do he wants to be an "X" or "O", then in the next game player 2 will be
+# chosing do he wants to be an "X" or "O".
