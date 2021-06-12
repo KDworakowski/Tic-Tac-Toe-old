@@ -1,3 +1,40 @@
+class Logic():
+
+    class Game():
+        player1 = ""
+        player2 = ""
+
+        board = [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        ]
+
+        player_turn = 0
+
+        score_board = {}
+
+        def __init__(self, player1: str, player2: str) -> None:
+            self.player1 = player1
+            self.player2 = player2
+            self.score_board = {self.player1: 0, self.player2: 0}
+
+
+    def __init__(self) -> None:
+        self.game = False
+
+    def create(self, player1: str = "player1", player2: str = "player2") -> bool:
+        self.game = self.Game(player1, player2)
+        return True
+
+    def status(self):
+        return {
+            "player1": self.game.player1,
+            "player2": self.game.player2,
+            "player_turn": self.game.player_turn,
+            "board": self.game.board,
+            "score_board": self.game.score_board
+        }
 """
 This function is responsible for printing tic tac toe.
 """
