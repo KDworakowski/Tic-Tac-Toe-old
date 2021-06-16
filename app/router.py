@@ -5,15 +5,11 @@ from fastapi import Body, status, APIRouter
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-from app.models import GamePlayers
+from app.models import GamePlayers, GameMove, RageQuit
 from app.logic import Logic
 
 router = APIRouter()
 logic = Logic()
-
-#     response_description="Create user entry.",
-#     response_model=bday.InputModel)
-# async def put_user(user_id: str, body: bday.InputModel = Body(...)):
 
 @router.post(
     "/game",
@@ -23,56 +19,68 @@ logic = Logic()
 async def game_create(
     body: GamePlayers = Body(...)
 ):
-    input_obj = jsonable_encoder(body)
-    logic.create(input_obj['player1'], input_obj['player2'])
+    obj = jsonable_encoder(body)
+    logic.create(
+        player1=obj['player1'],
+        player2=obj['player2']
+    )
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
-        content="OK")
+        content=jsonable_encoder({"detail": logic.status()}))
 
 
-@router.put("/game")
-async def game_move():
-    place_on_table_not_occupied = True
-    player_turn = True
-    game_over = False
+@router.put(
+    "/game",
+    response_description="Commits move.",
+    response_model=GameMove
+)
+async def game_move(
+    body: GameMove = Body(...)
+):
+    obj = jsonable_encoder(body)
 
-    if \
-        not place_on_table_not_occupied or \
-        not player_turn:
+    if not logic.move(
+        player_id=obj['player_id'],
+        coordinate=obj['coordinate']
+    ):
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
-            content="NOK")
+            content=jsonable_encoder({"detail": logic.status()}))
     else:
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content="OK")
+            content=jsonable_encoder({"detail": logic.status()}))
 
 
-@router.delete("/game")
-async def game_rage_quit():
-    game_over = False
+@router.delete(
+    "/game",
+    response_description="Rage quit.",
+    response_model=RageQuit
+)
+async def game_rage_quit(
+    body: RageQuit = Body(...)
+):
+    obj = jsonable_encoder(body)
 
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content="OK")
+    if not logic.ragequit(player_id=obj['player_id']):
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content=jsonable_encoder({"detail": logic.status()}))
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=jsonable_encoder({"detail": logic.status()}))
 
 
-@router.get("/game")
+@router.get(
+    "/game",
+    response_description="Getting game status.",
+)
 async def game_status():
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({"detail": logic.status()}))
 
-
-
-# @router.get(
-#     "/hello/{user_id}",
-#     response_description="Create user entry.")
-# async def get_user(user_id: str):
-#     return JSONResponse(
-#         status_code=status.HTTP_200_OK,
-#         content=jsonable_encoder({"detail": user_id})
-#     )
 
 @router.get("/health", response_description="Healthcheck")
 async def healthcheck():
