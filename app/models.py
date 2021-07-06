@@ -3,11 +3,15 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic.class_validators import validator
 
+
 class GamePlayers(BaseModel):
     player1: str
     player2: str
+
+
 class RageQuit(BaseModel):
     player_id: int
+
 
 class GameMove(BaseModel):
     player_id: int
@@ -29,7 +33,7 @@ class GameMove(BaseModel):
     @validator("coordinate")
     def check_move(self, coordinate):
         if (
-            len(coordinate) != 2 or \
+            len(coordinate) != 2 or
             coordinate[0] not in range(0,2) or \
             coordinate[1] not in range(0,2) or \
             self.game.board[coordinate[0]][coordinate[1]] != 0
