@@ -1,13 +1,21 @@
 from random import randint
-class Logic():
 
+from typing import Optional
+
+# from pydantic import BaseModel
+
+from dataclasses import dataclass
+
+class Logic():
+    @dataclass
     class Game():
+        # Create pydantic object for game properties with validation
         """
         For the purpouse of this project we assume that
         player1 has ID:1, and player2 has ID:2.
         """
-        player1 = ""
-        player2 = ""
+        player1: Optional[str]
+        player2: Optional[str]
 
         board = [
             [0, 0, 0],
@@ -15,15 +23,17 @@ class Logic():
             [0, 0, 0]
         ]
 
-        player_turn = 0
-        player_win = 0
+        player_turn: int
+        player_win: int
         finished = False
 
-        score_board = {}
+        score_board = dict
 
         def __init__(self, player1: str, player2: str) -> None:
             self.player1 = player1
             self.player2 = player2
+            self.player_turn = 0
+            self.player_win = 0
             self.score_board = {self.player1: 0, self.player2: 0}
 
     all_possible_winning_combinations = [
@@ -62,24 +72,24 @@ class Logic():
 
     def move(self, player_id, coordinate: list) -> bool:
         # check game status
-        if self.game.finished:
-            return False
+        # if self.game.finished:
+        #     return False
 
         # check player
-        if self.game.player_turn != player_id or player_id not in range(1,2):
-            return False
+        # if self.game.player_turn != player_id or player_id not in range(1,2):
+        #     return False
 
         # check move
-        if (
-            len(coordinate) != 2 or \
-            coordinate[0] not in range(0,2) or \
-            coordinate[1] not in range(0,2) or \
-            self.game.board[coordinate[0]][coordinate[1]] != 0 \
-        ):
-            return False
+        # if (
+        #     len(coordinate) != 2 or \
+        #     coordinate[0] not in range(0,2) or \
+        #     coordinate[1] not in range(0,2) or \
+        #     self.game.board[coordinate[0]][coordinate[1]] != 0 \
+        # ):
+        #     return False
 
         # move
-        self.game.board[coordinate[0]][coordinate[1]] = player_id
+        # self.game.board[coordinate[0]][coordinate[1]] = player_id
 
         # check if someone won
         for x in self.all_possible_winning_combinations:

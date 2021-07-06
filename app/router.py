@@ -8,8 +8,10 @@ from fastapi.encoders import jsonable_encoder
 from app.models import GamePlayers, GameMove, RageQuit
 from app.logic import Logic
 
+
 router = APIRouter()
 logic = Logic()
+
 
 @router.post(
     "/game",
