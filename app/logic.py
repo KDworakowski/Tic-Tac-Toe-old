@@ -2,12 +2,9 @@ from random import randint
 
 from typing import Optional
 
-# from pydantic import BaseModel
-
-from dataclasses import dataclass
 
 class Logic():
-    @dataclass
+
     class Game():
         # Create pydantic object for game properties with validation
         """
@@ -35,6 +32,11 @@ class Logic():
             self.player_turn = 0
             self.player_win = 0
             self.score_board = {self.player1: 0, self.player2: 0}
+            self.board = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0]
+            ]
 
     all_possible_winning_combinations = [
         [[0,0], [0,1], [0,2]],
@@ -48,6 +50,14 @@ class Logic():
         [[0,0], [1,1], [2,2]],
         [[0,2], [1,1], [2,0]]
     ]
+
+    error_codes = {
+        "GAME_FINISHED": 100,
+        "PLAYER_TURN_MISMATCH": 101,
+        "PLACE_ON_BOARD_ALREADY_TAKEN": 102,
+
+
+    }
 
     def __init__(self) -> None:
         self.game = False
@@ -70,43 +80,45 @@ class Logic():
             "player_win": self.game.player_win
         }
 
-    def move(self, player_id, coordinate: list) -> bool:
+    def move(self, player_id, coordinate: list) -> int:
         # check game status
-        # if self.game.finished:
-        #     return False
+        if self.game.finished:
+            return self.error_codes["GAME_FINISHED"]
 
         # check player
-        # if self.game.player_turn != player_id or player_id not in range(1,2):
-        #     return False
+        if self.game.player_turn != player_id:
+            return self.error_codes["PLAYER_TURN_MISMATCH"]
 
         # check move
-        # if (
-        #     len(coordinate) != 2 or \
-        #     coordinate[0] not in range(0,2) or \
-        #     coordinate[1] not in range(0,2) or \
-        #     self.game.board[coordinate[0]][coordinate[1]] != 0 \
-        # ):
-        #     return False
+        if self.game.board[coordinate[0]][coordinate[1]] != 0:
+            return self.error_codes["PLACE_ON_BOARD_ALREADY_TAKEN"]
 
         # move
-        # self.game.board[coordinate[0]][coordinate[1]] = player_id
+        self.game.board[coordinate[0]][coordinate[1]] = player_id
 
         # check if someone won
         for x in self.all_possible_winning_combinations:
             if not self.game.finished:
                 result = 0
-                for y in x:
-                    result += self.game.board[y[0]][y[1]]
+                if (self.game.board[x[0][0]][x[0][1]] == \
+                    self.game.board[x[1][0]][x[1][1]] == \
+                    self.game.board[x[2][0]][x[2][1]]
+                ):
+                    result = (
+                        self.game.board[x[0][0]][x[0][1]] + \
+                        self.game.board[x[1][0]][x[1][1]] + \
+                        self.game.board[x[2][0]][x[2][1]]
+                    )
 
-                if result == 3:
-                    self.game.player_win = 1
-                    self.game.finished = True
+                    if result == 3:
+                        self.game.player_win = 1
+                        self.game.finished = True
 
-                elif result == 6:
-                    self.game.player_win = 2
-                    self.game.finished = True
+                    elif result == 6:
+                        self.game.player_win = 2
+                        self.game.finished = True
 
-        # check i§ drawn
+        # check if drawn
         zeros = 0
         for x in range(0,2):
             for y in range(0,2):
@@ -120,7 +132,7 @@ class Logic():
             self.game.player_turn = ((self.game.player_turn + 2) % 2) + 1
             # self.game.player_turn = ((1 + 2) % 2) + 1 = 2 | ((2 + 2) % 2) + 1 = 1
 
-        return True
+        return 0
 
 
     def ragequit(self, player_id) -> bool:

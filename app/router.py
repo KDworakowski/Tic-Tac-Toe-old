@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from fastapi import Body, status, APIRouter
+from fastapi import Body, status, APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
@@ -12,6 +12,14 @@ from app.logic import Logic
 router = APIRouter()
 logic = Logic()
 
+# models.Base.metadata.create_all()
+
+# def get_db():
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
 
 @router.post(
     "/game",
@@ -31,6 +39,7 @@ async def game_create(
         content=jsonable_encoder({"detail": logic.status()}))
 
 
+
 @router.put(
     "/game",
     response_description="Commits move.",
@@ -41,13 +50,15 @@ async def game_move(
 ):
     obj = jsonable_encoder(body)
 
-    if not logic.move(
+    y = logic.move(
         player_id=obj['player_id'],
         coordinate=obj['coordinate']
-    ):
+    )
+
+    if y != 0:
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
-            content=jsonable_encoder({"detail": logic.status()}))
+            content=jsonable_encoder({"detail": logic.status(), "error": y}))
     else:
         return JSONResponse(
             status_code=status.HTTP_200_OK,
@@ -82,6 +93,8 @@ async def game_status():
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({"detail": logic.status()}))
+
+
 
 
 @router.get("/health", response_description="Healthcheck")

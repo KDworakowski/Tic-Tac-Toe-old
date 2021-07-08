@@ -1,3 +1,6 @@
 fastapi
 hypercorn
 pydantic
+sqlalchemy
+passlib
+bcrypt
