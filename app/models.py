@@ -3,6 +3,19 @@ from typing import List, Optional
 from pydantic import BaseModel
 from pydantic.class_validators import validator
 
+class User(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class ShowUser(BaseModel):
+    name: str
+    email: str
+    class Config():
+        orm_mode = True
+
+
 class GamePlayers(BaseModel):
     player1: str
     player2: str
@@ -11,6 +24,14 @@ class GamePlayers(BaseModel):
 class RageQuit(BaseModel):
     player_id: int
 
+class GameStatus(BaseModel):
+    id: str
+    player1: int
+    player2: int
+    player_turn: int
+    board: list
+    score_board: list
+    player_win: int
 
 class GameMove(BaseModel):
     player_id: int
@@ -33,13 +54,3 @@ class GameMove(BaseModel):
         ):
             raise ValueError("coordinate out of the range; got: " + str(y))
         return y
-
-# class GameStatus(Base):
-#     __tablename__ = "game_status"
-
-#     player1 = Column(Integer)
-#     player2 = Column(Integer)
-#     player_turn = Column(Integer)
-#     board = Column(List)
-#     score_board = Column(List)
-#     player_win = Column(Integer)

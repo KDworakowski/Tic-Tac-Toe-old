@@ -1,16 +1,25 @@
 from random import randint
-
 from typing import Optional
+from fastapi.param_functions import Depends
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine, select, update, MetaData, Table, and_
+from sqlalchemy.sql.expression import insert, true
+import jsonpickle
+import uuid
+import time
+
+from app.database import *
+from app.schemas import GameStatus_db
 
 
 class Logic():
-
     class Game():
         # Create pydantic object for game properties with validation
         """
         For the purpouse of this project we assume that
         player1 has ID:1, and player2 has ID:2.
         """
+        id: int
         player1: Optional[str]
         player2: Optional[str]
 
@@ -26,7 +35,8 @@ class Logic():
 
         score_board = dict
 
-        def __init__(self, player1: str, player2: str) -> None:
+        def __init__(self, id: str, player1: str, player2: str) -> None:
+            self.id = id
             self.player1 = player1
             self.player2 = player2
             self.player_turn = 0
@@ -62,16 +72,53 @@ class Logic():
     def __init__(self) -> None:
         self.game = False
 
+    def makeUUID(self, text: str = "") -> str:
+        timestamp = time.time()
+        return str(uuid.uuid5(uuid.NAMESPACE_URL, f"{text}{timestamp}"))
+
+    def create_state(self, db: Session) -> bool:
+        stmt = insert(
+            GameStatus_db
+        ).values(
+            id=self.game.id,
+            serialized_game_status=jsonpickle.encode(self.game)
+        )
+        db.execute(stmt)
+        return True
+
+    def save_state(self, id, db: Session) -> bool:
+        stmt = update(
+            GameStatus_db
+        ).where(
+            GameStatus_db.columns.id == id
+        ).values(
+            serialized_game_status = jsonpickle.encode(self.game)
+        )
+        db.execute(stmt)
+        return True
+
+    def load_state(self, id, db: Session) -> bool:
+        stmt = select([
+            GameStatus_db.columns.id,
+            GameStatus_db.columns.serialized_game_status]
+        ).where(
+            GameStatus_db.columns.id == id
+        )
+        result = db.execute(stmt).fetchall()
+        self.game = jsonpickle.decode(result[0]["serialized_game_status"])
+        return True
+
     def draw_player_turn(self) -> None:
         self.game.player_turn = randint(1,2)
 
     def create(self, player1: str = "player1", player2: str = "player2") -> bool:
-        self.game = self.Game(player1, player2)
+        self.game = self.Game(self.makeUUID("id"), player1, player2)
         self.draw_player_turn()
         return True
 
     def status(self):
         return {
+            "id": self.game.id,
             "player1": self.game.player1,
             "player2": self.game.player2,
             "player_turn": self.game.player_turn,
