@@ -9,12 +9,22 @@ from sqlalchemy.orm import Session
 
 from app.models import GamePlayers, GameMove, RageQuit, User, ShowUser
 from app.schemas import Base, User_db
-from app.database import *
+from app.database import SessionLocal, engine
 from app.logic import Logic
 from app.hashing import Hashing
 
 router = APIRouter()
 logic = Logic()
+
+Base.metadata.create_all(bind=engine)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @router.post(
     "/user",
@@ -150,8 +160,19 @@ def json_test():
 @router.get(
     "/db/create"
 )
-def db_create():
-    init_db()
+def db_create(db: Session = Depends(get_db)):
+    # app = FastAPI()
+    # db = sqlalchemy(app)
+
+    # db.create_all()
+    # db.session.commit()
+
+    # admin = User('admin', 'admin@example.com', 'dupa123')
+    # db.session.add(admin)
+    # db.session.commit()
+
+    db.create_all()
+    db.session.commit()
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
         content=jsonable_encoder({"detail": "Database created"}))
