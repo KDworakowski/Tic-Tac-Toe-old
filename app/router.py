@@ -7,9 +7,12 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
-from app.models import GamePlayers, GameMove, RageQuit, User, ShowUser
-from app.schemas import Base, User_db
-from app.database import SessionLocal, engine
+import jsonpickle
+
+import app.models
+import app.schemas
+
+from app.database import SessionLocal, engine, Base
 from app.logic import Logic
 from app.hashing import Hashing
 
@@ -28,11 +31,11 @@ def get_db():
 
 @router.post(
     "/user",
-    response_model=ShowUser,
+    response_model=app.schemas.ShowUser,
     response_description="Create user.",
     tags=["user"]
     )
-def create_user(request: User, db: Session = Depends(get_db)):
+def create_user(request: app.schemas.User, db: Session = Depends(get_db)):
         new_user = User_db(name=request.name,email=request.email,password=Hashing.bcrypt(request.password))
         db.add(new_user)
         db.commit()
@@ -42,12 +45,12 @@ def create_user(request: User, db: Session = Depends(get_db)):
 
 @router.get(
     "/user/{id}",
-    response_model=ShowUser,
+    response_model=app.schemas.ShowUser,
     response_description="Get user data without password.",
     tags=["user"]
 )
 def get_user(id: int, db: Session = Depends(get_db)):
-    user = db.query(User_db).filter(User_db.id == id).first()
+    user = db.query(app.schemas.User).filter(User_db.id == id).first()
     if not user:
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -59,11 +62,11 @@ def get_user(id: int, db: Session = Depends(get_db)):
 @router.post(
     "/game",
     response_description="Creates game.",
-    response_model=GamePlayers,
+    response_model=app.schemas.GamePlayers,
     tags=["game"]
 )
 async def game_create(
-    body: GamePlayers = Body(...),
+    body: app.schemas.GamePlayers = Body(...),
     db: Session = Depends(get_db)
 ):
     obj = jsonable_encoder(body)
@@ -77,19 +80,19 @@ async def game_create(
         status_code=status.HTTP_201_CREATED,
         content=jsonable_encoder({"detail": logic.status()}))
 
-
-
 @router.put(
     "/game",
     response_description="Commits move.",
-    response_model=GameMove,
+    response_model=app.schemas.GameMove,
     tags=["game"]
 )
 async def game_move(
-    body: GameMove = Body(...),
+    body: app.schemas.GameMove = Body(...),
     db: Session = Depends(get_db)
 ):
     obj = jsonable_encoder(body)
+# {'id': 'b32a8e9a-edc5-52b2-937f-30bba0e7e911', 'player1': 'dupa', 'player2': 'dupsko', 'player_turn': 1, 'board': \
+# [[0, 0, 0], [0, 0, 0], [0, 0, 0]], 'score_board': {'dupa': 0, 'dupsko': 0}, 'player_win': 0}
 
     y = logic.move(
         player_id=obj['player_id'],
@@ -109,11 +112,11 @@ async def game_move(
 @router.delete(
     "/game",
     response_description="Rage quit.",
-    response_model=RageQuit,
+    response_model=app.schemas.RageQuit,
     tags=["game"]
 )
 async def game_rage_quit(
-    body: RageQuit = Body(...)
+    body: app.schemas.RageQuit = Body(...)
 ):
     obj = jsonable_encoder(body)
 

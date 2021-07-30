@@ -1,16 +1,18 @@
 from random import randint
 from typing import Optional
 from fastapi.param_functions import Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
 from sqlalchemy import create_engine, select, update, MetaData, Table, and_
 from sqlalchemy.sql.expression import insert, true
 
 import jsonpickle
+
 import uuid
 import time
 
-from app.database import SessionLocal, engine
-from app.schemas import Base, GameStatus_db
+from app.database import SessionLocal, engine, Base
+import app.schemas
+import app.models
 
 Base.metadata.create_all(bind=engine)
 
@@ -85,8 +87,15 @@ class Logic():
         timestamp = time.time()
         return str(uuid.uuid5(uuid.NAMESPACE_URL, f"{text}{timestamp}"))
 
+    def get_db():
+        db = SessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
+
     def create_state(self, db: Session = Depends(get_db)) -> bool:
-        stmt = GameStatus_db(
+        stmt = app.models.GameStatus(
             id=self.game.id,
             serialized_game_status=jsonpickle.encode(self.game)
         )
@@ -96,41 +105,29 @@ class Logic():
         return True
 
     def save_state(self, id, db: Session = Depends(get_db)) -> bool:
-        stmt: GameStatus_db = db.query(GameStatus_db).filter(GameStatus_db.id == self.game.id).first()
-        db.update(stmt)
-        db.commit()
-        # stmt = (
-        #     update(GameStatus_db).
-        #     where(GameStatus_db.id == self.game.id).
-        #     values(serialized_game_status = jsonpickle.encode(self.game))
-        # )
-
-        # stmt = update(
-        #     GameStatus_db
-        # ).where(
-        #     GameStatus_db.id == self.game.id
-        # ).values(
-        #     serialized_game_status = jsonpickle.encode(self.game)
-        # )
+        stmt = app.models.GameStatus(
+            id=self.game.id,
+        )
+        stmt.serialized_game_status=2137
         print(
             "SELF.ID:", self.game.id,
             "STMT:", stmt,
             "ID", id
         )
-        print(stmt)
-        # db.execute(stmt)
+        db.add(stmt)
+        db.commit()
+        db.refresh(stmt)
         return True
 
-    def load_state(self, id, db: Session = Depends(get_db)) -> bool:
-        stmt = select([
-            GameStatus_db.columns.id,
-            GameStatus_db.columns.serialized_game_status]
-        ).where(
-            GameStatus_db.columns.id == id
-        )
-        result = db.execute(stmt).fetchall()
-        self.game = jsonpickle.decode(result[0]["serialized_game_status"])
-        return True
+    # def load_state(self, id, db: Session = Depends(get_db)) -> bool:
+    #     stmt = select([
+    #         GameStatus.columns.id,
+    #         GameStatus.columns.serialized_game_status]
+    #     ).where(
+    #         GameStatus.columns.id == id
+    #     )
+    #     self.game = jsonpickle.decode(result[0]["serialized_game_status"])
+    #     return True
 
     def draw_player_turn(self) -> None:
         self.game.player_turn = randint(1,2)
