@@ -1,0 +1,12 @@
+.game-field  {
+    border:1px #000 solid;
+    min-width: 4em;
+    min-height: 4em;
+}
+
+.game-field>span {
+    margin: 20px;
+    font-size: 2em;
+    width: 100%;
+    text-align: center;
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Tic Tac Toe
+    </title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://demos.creative-tim.com/notus-js/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css">
+    <link href="./style.css" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <div class="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+        <div class="relative py-3 sm:max-w-xl sm:mx-auto">
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-sky-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl">
+            </div>
+            <div class="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+                <div class="max-w-md mx-auto">
+                    <div class="pt-6 text-center leading-6 font-bold sm:text-lg sm:leading-7">
+                        Tic Tac Toe
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="game-field game-field-1">
+                            <span></span>
+                        </div>
+                        <div class="game-field game-field-2">
+                            <span></span>
+                        </div>
+                        <div class="game-field game-field-3">
+                            <span></span>
+                        </div>
+                        <div class="game-field game-field-4">
+                            <span></span>
+                        </div>
+                        <div class="game-field game-field-5">
+                            <span></span>
+                        </div>
+                        <div class="game-field game-field-6">
+                            <span></span>
+                        </div>
+                        <div class="game-field game-field-7">
+                            <span></span>
+                        </div>
+                        <div class="game-field game-field-8">
+                            <span></span>
+                        </div>
+                        <div class="game-field game-field-9">
+                            <span></span>
+                        </div>
+                    </div>
+                    <div class="divide-y divide-gray-200">
+                        <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+
+                        </div>
+                        <div class="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                id="create-game">
+                                Create Game
+                            </button>
+                            <input type="hidden" id="game-data" value=""/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="./script.js"></script>
+</body>
+
+</html>
