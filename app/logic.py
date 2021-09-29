@@ -10,18 +10,9 @@ import jsonpickle
 import uuid
 import time
 
-from app.database import SessionLocal, engine, Base
+from app.database import engine, Base, get_db
 import app.schemas
 import app.models
-
-Base.metadata.create_all(bind=engine)
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 class Logic():
     class Game():
@@ -87,13 +78,6 @@ class Logic():
         timestamp = time.time()
         return str(uuid.uuid5(uuid.NAMESPACE_URL, f"{text}{timestamp}"))
 
-    def get_db():
-        db = SessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
-
     def create_state(self, db: Session = Depends(get_db)) -> bool:
         stmt = app.models.GameStatus(
             id=self.game.id,
@@ -104,11 +88,12 @@ class Logic():
         db.refresh(stmt)
         return True
 
-    def save_state(self, id, db: Session = Depends(get_db)) -> bool:
-        stmt = app.models.GameStatus(
-            id=self.game.id,
-        )
-        stmt.serialized_game_status=2137
+    def save_state(self, id, db: Session = get_db()) -> bool:
+        # stmt = app.models.GameStatus(
+        #     id=self.game.id,
+        # )
+        stmt = db.execute(select(app.models.GameStatus).filter_by(id=self.game.id)).scalar_one()
+        stmt.serialized_game_status=jsonpickle.encode(self.game)
         print(
             "SELF.ID:", self.game.id,
             "STMT:", stmt,

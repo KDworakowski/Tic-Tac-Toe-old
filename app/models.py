@@ -6,14 +6,14 @@ from sqlalchemy.orm import relationship
 from .database import Base
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True)
     name = Column(Integer)
     email = Column(Integer)
     password = Column(Integer)
 class GameStatus(Base):
     __tablename__ = "game_status"
-    id = Column(String, primary_key=True, index=True)
-    serialized_game_status = Column(String)
+    id = Column(String(32), primary_key=True)
+    serialized_game_status = Column(String(512))
 
 # class GameMove(Base):
 #     player_id: int
