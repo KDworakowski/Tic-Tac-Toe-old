@@ -7,8 +7,8 @@ let gameData = document.getElementById("game-data");
 const apiurl = "http://0.0.0.0:8080"
 createGameButton.addEventListener("click", function(){
     axios.post(`${apiurl}/game`, {
-        player1: 'kuba',
-        player2: 'kacper'
+        player1: 'player1',
+        player2: 'player2'
       })
       .then(function (response) {
         console.log(response.data.detail);
