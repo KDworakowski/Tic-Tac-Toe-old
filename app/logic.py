@@ -89,9 +89,6 @@ class Logic():
         return True
 
     def save_state(self, id, db: Session = get_db()) -> bool:
-        # stmt = app.models.GameStatus(
-        #     id=self.game.id,
-        # )
         stmt = db.execute(select(app.models.GameStatus).filter_by(id=self.game.id)).scalar_one()
         stmt.serialized_game_status=jsonpickle.encode(self.game)
         print(
@@ -104,15 +101,15 @@ class Logic():
         db.refresh(stmt)
         return True
 
-    # def load_state(self, id, db: Session = Depends(get_db)) -> bool:
-    #     stmt = select([
-    #         GameStatus.columns.id,
-    #         GameStatus.columns.serialized_game_status]
-    #     ).where(
-    #         GameStatus.columns.id == id
-    #     )
-    #     self.game = jsonpickle.decode(result[0]["serialized_game_status"])
-    #     return True
+    def load_state(self, id, db: Session = Depends(get_db)) -> bool:
+        stmt = select([
+            GameStatus.columns.id,
+            GameStatus.columns.serialized_game_status]
+        ).where(
+            GameStatus.columns.id == id
+        )
+        self.game = jsonpickle.decode(result[0]["serialized_game_status"])
+        return True
 
     def draw_player_turn(self) -> None:
         self.game.player_turn = randint(1,2)

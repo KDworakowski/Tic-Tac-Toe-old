@@ -1,9 +1,10 @@
 import pytest
 import os
-from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy import Column, Date, Integer, String
+from sqlalchemy import create_engine, select
+from sqlalchemy import Column, Date, Integer, String, select
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import jsonpickle
 
 from app.database import Base
 
@@ -28,26 +29,54 @@ def resource(request):
         print("teardown")
 
         os.remove("school.db")
+        # os.remove("user.db")
 
-    # request.addfinalizer(teardown)
+    request.addfinalizer(teardown)
 
     SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
     return SessionLocal()
 
 class TestResource:
+    # def create_state(self, resource):
+    #     stmt = app.models.GameStatus(
+    #         id=self.game.id,
+    #         serialized_game_status=jsonpickle.encode(self.game)
+    #     )
+    #     resource.add(stmt)
+    #     resource.commit()
+    #     resource.refresh(stmt)
+
     def test_insert(self, resource):
         stmt = app.models.GameStatus(
             id=2,
+            serialized_game_status=2324234334242343
         )
-        stmt.serialized_game_status=1
         resource.add(stmt)
         resource.commit()
         resource.refresh(stmt)
 
-# def test_answer():
-#     password_length = 8
-#     p = PasswordGenerator(length=int(password_length))
-#     password = p.password_generator()
+    def save_state(self, resource):
+        stmt = resource.execute(select(app.models.GameStatus).filter_by(id=2)).scalar_one()
+        stmt.serialized_game_status=00000
+        # print(
+        #     "SELF.ID:", self.game.id,
+        #     "STMT:", stmt,
+        #     "ID", id
+        # )
+        resource.add(stmt)
+        resource.commit()
+        resource.refresh(stmt)
 
-#     assert password_length == len(password)
+
+
+
+    # def load_state(self, id, resource) -> bool:
+    #     stmt = select([
+    #         app.models.GameStatus.columns.id,
+    #         app.models.GameStatus.columns.serialized_game_status]
+    #     ).where(
+    #         app.models.GameStatus.columns.id == id
+    #     )
+    #     self.game = jsonpickle.decode(result[0]["serialized_game_status"])
+    #     return True

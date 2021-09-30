@@ -7,3 +7,4 @@ bcrypt
 jsonpickle
 sqlalchemy-utils
 pytest
+pytest-repeat
